@@ -1,0 +1,211 @@
+.chat {
+  width: 80%;
+  height: 100%;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.5rem;
+}
+
+.chat::-webkit-scrollbar {
+  display: none;
+}
+
+.message {
+  color: white;
+  background: #392F5AEE;
+  margin: 0.5rem;
+  border-radius: 20px;
+  padding: 1rem;
+  /* max-height: 300px; */
+  overflow-y: auto;
+  position: relative;
+  display: flex;
+}
+
+.message .q-number {
+  margin: 1rem;
+}
+
+.message .contents {
+  width: 100%;
+}
+
+.author {
+  display: flex;
+  font-size: 1rem;
+  align-items: center;
+}
+
+.author img {
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  margin-bottom: 0.25rem;
+}
+
+.author .name {
+  margin-left: 0.5rem;
+  font-size: 1.2rem;
+  word-break: break-all;
+  font-family: 'Fira Sans', sans-serif;
+}
+
+.author .avatar {
+  position: relative;
+}
+
+.author .avatar .member-badge img {
+  position: absolute;
+  bottom: -5px;
+  width: 25px;
+  height: 25px;
+}
+
+.message .content {
+  padding: 0.25rem;
+  flex: 5;
+  /* word-break: break-all; */
+  overflow-wrap: break-word;
+  display: block;
+}
+
+.message .content textarea {
+  width: 100%;
+  font-size: 1.5rem;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.time-sent {
+  font-size: 0.75rem;
+  text-align: right;
+  display: block;
+  min-width: 100px;
+}
+
+p {
+  margin: 0;
+  padding: 0;
+}
+
+.bottom-bar {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.voters {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.button {
+  margin: 0.25rem;
+  cursor: pointer;
+}
+
+a,
+a:visited {
+  color: #E6AF2E;
+}
+
+.messages-item {
+  transition: all 500ms ease-in;
+}
+
+.messages-move {
+  transition: transform 250ms;
+}
+
+.messages-enter-active,
+.messages-leave-active {
+  transition: all 500ms ease-in;
+}
+
+.messages-enter {
+  opacity: 0;
+  transform: translateY(-200px) translateX(600px);
+}
+
+.messages-leave-to {
+  opacity: 0;
+}
+
+.star {
+  display: none;
+}
+
+.moderator .star {
+  display: block;
+  margin-left: 0.5rem;
+  color: #FFB700;
+}
+
+.member .name {
+  color: rgb(255, 221, 18);
+}
+
+.moderator .name {
+  color: #22DE1F;
+}
+
+img[src$="#emote"] {
+  height: 50px;
+}
+
+.reply {
+  box-shadow: 11px 10px 43px 0px rgba(0, 0, 0, 0.51);
+}
+
+.delete-button {
+  margin-top: 0.25rem;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+
+.delete-button svg line {
+  stroke: white;
+}
+
+.delete-button svg polygon {
+  stroke: white;
+}
+
+.voter {
+  margin: 0 0.5rem;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+a.button {
+  display: inline-block;
+  padding: 0.35em 1.2em;
+  border: 0.1em solid #FFFFFF;
+  margin: 0 0.3em 0.3em 0;
+  border-radius: 0.12em;
+  box-sizing: border-box;
+  text-decoration: none;
+  font-weight: 300;
+  color: #FFFFFF;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+a.button:hover, a.button.active {
+  color: #000000;
+  background-color: #FFFFFF;
+}
+
+@media all and (max-width:30em) {
+  a.button {
+    display: block;
+    margin: 0.4em auto;
+  }
+}
