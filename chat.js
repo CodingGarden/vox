@@ -17,7 +17,7 @@ topic.addEventListener('click', () => {
 });
 
 (async () => {
-  DOMPurify.addHook('afterSanitizeAttributes', (node) => {    
+  DOMPurify.addHook('afterSanitizeAttributes', (node) => {
     if (node.hasAttribute('src')) {
       node.setAttribute('src', `https://external-content.duckduckgo.com/iu/?u=${node.getAttribute('src')}`);
     }
@@ -76,7 +76,36 @@ topic.addEventListener('click', () => {
     },
     async created() {
       document.querySelector('.chat').style.display = '';
-      this.loadMessages();
+      await this.loadMessages();
+
+      const num = Number(location.hash.slice(1));
+      if (num && !isNaN(num) && this.allByNum[num]) {
+        const message = this.allByNum[num];
+
+        if (message) {
+          this.selectedTab = message.type;
+
+          const observer = new MutationObserver(mutations => {
+            mutations.forEach(mutation => {
+              if (!mutation.addedNodes) return;
+
+              mutation.addedNodes.forEach(node => {
+                if (node.id === `num-${num}`) {
+
+                  node.addEventListener('transitionend', () => {
+                    node.scrollIntoView({ behavior: 'smooth' });
+                    observer.disconnect();
+                  }, { once: true });
+                }
+              });
+            });
+          });
+
+          observer.observe(document.querySelector('.messages'), {
+            childList: true,
+          });
+        }
+      }
     },
     computed: {
       allByNum() {
