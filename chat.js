@@ -32,6 +32,7 @@ topic.addEventListener('click', () => {
           'style',
           'onerror',
           'onload',
+          'onanimationend',
         ],
         FORBID_TAGS: [
           'table',
@@ -40,6 +41,8 @@ topic.addEventListener('click', () => {
           'video',
           'style',
           'iframe',
+          'object',
+          'embed',
           'textarea',
           'frame',
           'frameset'
@@ -130,7 +133,7 @@ topic.addEventListener('click', () => {
           }
         } else if (command.match(/^!(comment)/)) {
           const num = (args.shift() || '').replace('#', '');
-          if (!num && !this.allByNum[num]) return;
+          if (!num || isNaN(num) || !this.allByNum[num]) return;
           if (command === '!comment') {
             const index = this.allByNum[num].comments.findIndex((item) => item.id === message.id);
             if (index !== -1) {
@@ -154,15 +157,27 @@ topic.addEventListener('click', () => {
         voxPopuliService.on('removed', (message) => {
           this.onRemoved(message);
         })
-        const processMessages = message => {
+        const processMessages = type => message => {
           processMessage(message);
+          message.type = type;
           message.upvotes = [...new Set(message.upvotes)];
           message.comments.forEach(processMessage);
         };
-        all.questions.forEach(processMessages);
-        all.ideas.forEach(processMessages);
-        all.submissions.forEach(processMessages);
+        all.questions.forEach(processMessages('questions'));
+        all.ideas.forEach(processMessages('ideas'));
+        all.submissions.forEach(processMessages('submissions'));
         this.all = all;
+        if (window.location.hash) {
+          const num = window.location.hash.split('-')[1];
+          if (this.allByNum.hasOwnProperty(num)) {
+            const message = this.allByNum[num];
+            this.selectedTab = message.type;
+            setTimeout(() => {
+              // force browser to scroll to hash after animation
+              window.location.hash = window.location.hash;
+            }, 600); // wait for animation to finish
+          }
+        }
         setInterval(() => {
           const setTimeSents = message => {
             setTimesent(message);
@@ -184,16 +199,19 @@ topic.addEventListener('click', () => {
           message.upvotes = [];
           message.upvote_count = 0;
           if (command === '!ask') {
+            message.type = 'questions';
             this.all.questions.push(message);
           } else if (command === '!idea') {
+            message.type = 'ideas';
             this.all.ideas.push(message);
           } else if (command === '!submit') {
+            message.type = 'submissions';
             this.all.submissions.push(message);
           }
           processMessage(message);
         } else if (command.match(/^!(comment|upvote)/)) {
           const num = (args.shift() || '').replace('#', '');
-          if (!num && !isNaN(num) && !this.allByNum[num]) return;
+          if (!num || isNaN(num) || !this.allByNum[num]) return;
           if (command === '!comment') {
             message.content = args.join(' ');
             processMessage(message);
