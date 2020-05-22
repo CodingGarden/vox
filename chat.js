@@ -23,8 +23,8 @@ topic.addEventListener('click', () => {
     }
   });
 
-  const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:2020' : 'https://api.coding.garden';
-
+  // const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:2020' : 'https://api.coding.garden';
+  const API_URL = 'https://api.coding.garden';
   function sanitize(message) {
     message.sanitized = DOMPurify
       .sanitize(marked(message.content), {
@@ -154,15 +154,26 @@ topic.addEventListener('click', () => {
         voxPopuliService.on('removed', (message) => {
           this.onRemoved(message);
         })
-        const processMessages = message => {
+        const processMessages = type => message => {
           processMessage(message);
+          message.type = type;
           message.upvotes = [...new Set(message.upvotes)];
           message.comments.forEach(processMessage);
         };
-        all.questions.forEach(processMessages);
-        all.ideas.forEach(processMessages);
-        all.submissions.forEach(processMessages);
+        all.questions.forEach(processMessages('questions'));
+        all.ideas.forEach(processMessages('ideas'));
+        all.submissions.forEach(processMessages('submissions'));
         this.all = all;
+        if (window.location.hash) {
+          const num = window.location.hash.split('-')[1];
+          if (this.allByNum.hasOwnProperty(num)) {
+            const message = this.allByNum[num];
+            this.selectedTab = message.type;
+            setTimeout(() => {
+              window.location.hash = window.location.hash;
+            }, 600); // wait for animation to finish
+          }
+        }
         setInterval(() => {
           const setTimeSents = message => {
             setTimesent(message);
@@ -184,10 +195,13 @@ topic.addEventListener('click', () => {
           message.upvotes = [];
           message.upvote_count = 0;
           if (command === '!ask') {
+            message.type = 'questions';
             this.all.questions.push(message);
           } else if (command === '!idea') {
+            message.type = 'ideas';
             this.all.ideas.push(message);
           } else if (command === '!submit') {
+            message.type = 'submissions';
             this.all.submissions.push(message);
           }
           processMessage(message);

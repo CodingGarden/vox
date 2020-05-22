@@ -34,8 +34,8 @@
           :class="{ active: selectedTab === 'submissions' }">Submissions ({{all.submissions.length}})</a>
       </div>
       <transition-group class="messages" name="messages" tag="div">
-        <div class="message messages-item" v-for="message in sortedItems" :key="message.id">
-          <h1 class="q-number">#{{message.num}}</h1>
+        <div class="message messages-item" v-for="message in sortedItems" :id="`num-${message.num}`" :key="message.id">
+          <h1 class="q-number"><a :href="`#num-${message.num}`">#{{message.num}}</a></h1>
           <div class="contents">
             <div v-if="isAdmin" class="button delete-button" @click="archive(message)">
               <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"

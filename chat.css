@@ -1,11 +1,19 @@
+.messages {
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  height: calc(100% + 58px);
+}
+
 .chat {
+  position: relative;
   width: 80%;
   height: 100%;
-  overflow-y: auto;
   margin: 0;
   padding: 0;
   font-family: 'Montserrat', sans-serif;
   font-size: 1.5rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .chat::-webkit-scrollbar {
@@ -179,9 +187,15 @@ img[src$="#emote"] {
 }
 
 .tabs {
+  position: absolute;
+  top: 0;
   display: flex;
   justify-content: center;
   align-items: center;
+  position: sticky;
+  background: black;
+  width: 100%;
+  z-index: 100;
 }
 
 a.button {
