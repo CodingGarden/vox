@@ -32,6 +32,7 @@ topic.addEventListener('click', () => {
           'style',
           'onerror',
           'onload',
+          'onanimationend',
         ],
         FORBID_TAGS: [
           'table',
@@ -40,6 +41,8 @@ topic.addEventListener('click', () => {
           'video',
           'style',
           'iframe',
+          'object',
+          'embed',
           'textarea',
           'frame',
           'frameset'
@@ -130,7 +133,7 @@ topic.addEventListener('click', () => {
           }
         } else if (command.match(/^!(comment)/)) {
           const num = (args.shift() || '').replace('#', '');
-          if (!num && !this.allByNum[num]) return;
+          if (!num || isNaN(num) || !this.allByNum[num]) return;
           if (command === '!comment') {
             const index = this.allByNum[num].comments.findIndex((item) => item.id === message.id);
             if (index !== -1) {
@@ -170,6 +173,7 @@ topic.addEventListener('click', () => {
             const message = this.allByNum[num];
             this.selectedTab = message.type;
             setTimeout(() => {
+              // force browser to scroll to hash after animation
               window.location.hash = window.location.hash;
             }, 600); // wait for animation to finish
           }
@@ -207,7 +211,7 @@ topic.addEventListener('click', () => {
           processMessage(message);
         } else if (command.match(/^!(comment|upvote)/)) {
           const num = (args.shift() || '').replace('#', '');
-          if (!num && !isNaN(num) && !this.allByNum[num]) return;
+          if (!num || isNaN(num) || !this.allByNum[num]) return;
           if (command === '!comment') {
             message.content = args.join(' ');
             processMessage(message);
