@@ -118,7 +118,9 @@ topic.addEventListener('click', () => {
         // debounce until last item has been added to page
         scrollTimeOut = setTimeout(() => {
           // force browser to scroll to item after all items have loaded
-          window.location.href = window.location.href;
+          if (window.location.hash) {
+            window.location.href = window.location.href;
+          }
           this.firstLoad = true;
         }, 100);
       },
