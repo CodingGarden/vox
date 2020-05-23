@@ -64,10 +64,12 @@ topic.addEventListener('click', () => {
   const client = feathers();
   client.configure(feathers.socketio(io(API_URL)));
   const voxPopuliService = client.service('vox/populi');
+  let scrollTimeOut;
   new Vue({
     el: '#messages',
     data: {
       showInfo: true,
+      firstLoad: true,
       isAdmin: localStorage.token,
       selectedTab: 'questions',
       all: {
@@ -110,6 +112,16 @@ topic.addEventListener('click', () => {
       }
     },
     methods: {
+      scrollIntoView(item) {
+        if (!this.firstLoad) return;
+        clearTimeout(scrollTimeOut);
+        // debounce until last item has been added to page
+        scrollTimeOut = setTimeout(() => {
+          // force browser to scroll to item after all items have loaded
+          window.location.hash = window.location.hash;
+          this.firstLoad = true;
+        }, 100);
+      },
       onRemoved(message) {
         const args = message.message.split(' ');
         const command = args.shift();
@@ -172,10 +184,6 @@ topic.addEventListener('click', () => {
           if (this.allByNum.hasOwnProperty(num)) {
             const message = this.allByNum[num];
             this.selectedTab = message.type;
-            setTimeout(() => {
-              // force browser to scroll to hash after animation
-              window.location.hash = window.location.hash;
-            }, 600); // wait for animation to finish
           }
         }
         setInterval(() => {

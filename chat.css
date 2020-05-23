@@ -1,19 +1,15 @@
 .messages {
   overflow-y: auto;
   scroll-behavior: smooth;
-  height: calc(100% + 58px);
 }
 
 .chat {
   position: relative;
   width: 80%;
-  height: 100%;
   margin: 0;
   padding: 0;
   font-family: 'Montserrat', sans-serif;
   font-size: 1.5rem;
-  display: flex;
-  flex-direction: column;
 }
 
 .chat::-webkit-scrollbar {
@@ -34,6 +30,8 @@
 
 .message .q-number {
   margin: 1rem;
+  padding-top: 75px; /* adjust anchor for sticky header */
+  margin-top: -75px; /* adjust anchor for sticky header */
 }
 
 .message .contents {
@@ -221,5 +219,31 @@ a.button:hover, a.button.active {
   a.button {
     display: block;
     margin: 0.4em auto;
+  }
+}
+
+@media all and (max-width: 846px) {
+  #logo {
+    display: none;
+  }
+
+  .tabs {
+    font-size: 0.75rem;
+  }
+
+  .message .q-number {
+    margin: 1rem;
+    padding-top: 55px; /* adjust anchor for sticky header */
+    margin-top: -55px; /* adjust anchor for sticky header */
+  }
+}
+
+@media all and (max-width: 800px) {
+  .chat {
+    width: 99%;
+  }
+  .message {
+    flex-direction: column;
+    width: 96%;
   }
 }
