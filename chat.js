@@ -7,6 +7,8 @@ import feathers from './lib/feathers.js';
 
 const topic = document.querySelector('#topic');
 const info = document.querySelector('#info');
+const loading = document.querySelector('.loading');
+const main = document.querySelector('main');
 
 topic.addEventListener('click', () => {
   if (info.style.display === 'none') {
@@ -197,6 +199,8 @@ topic.addEventListener('click', () => {
           all.ideas.forEach(setTimeSents);
           all.submissions.forEach(setTimeSents);
         }, 2000);
+        loading.style.opacity = 0;
+        main.style.opacity = 1;
       },
       addLatestMessage(message) {
         const args = message.message.split(' ');
