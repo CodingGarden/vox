@@ -49,12 +49,19 @@
                   moderator: message.badges.moderator,
                   member: message.subscriber,
                 }">
-              <span class="name">{{message.display_name}}</span>
-              <div class="avatar">
-                <span class="member-badge" v-if="message.subscriber">
-                  <img src="https://qna.coding.garden/logo.png" />
+                <div class="avatar">
+                  <img :src="message.user.logo">
+                  <span class="member-badge" v-if="message.user.id !== broadcasterId && message.badges.subscriber">
+                    <img src="https://static-cdn.jtvnw.net/badges/v1/5b8a0d76-4670-4f99-8874-964e20b7a839/3">
+                  </span>
+                </div>
+                <span class="badges-and-name">
+                  <span v-if="message.user.id !== broadcasterId && message.badges.moderator"><img class="badge moderator" src="https://cdn.frankerfacez.com/static/badges/twitch/2/moderator/1/4.png"></span>
+                  <span v-if="message.badges.vip"><img class="badge vip" src="https://cdn.frankerfacez.com/static/badges/twitch/2/vip/1/4.png"></span>
+                  <span v-if="message.badges.founder"><img class="badge" src="https://static-cdn.jtvnw.net/badges/v1/511b78a9-ab37-472f-9569-457753bbe7d3/3"></span>
+                  <span class="name">{{message.user.display_name}}</span>
+                  <span class="star" v-if="message.user.id == broadcasterId">★</span>
                 </span>
-              </div>
             </span>
             <span class="content" v-html="message.sanitized"></span>
             <span class="content" v-if="message.showSource">
@@ -63,9 +70,8 @@
             <div class="bottom-bar m-1">
               <div>
                 <div v-if="message.upvotes.length" class="author voters">
-                  <strong>{{message.upvotes.length}} Upvotes:</strong>
-                  <div class="avatar" v-for="voter in message.upvotes">
-                    <span class="voter">{{voter}}</span>
+                  <div class="avatar" v-for="voter in message.upvotes" v-if="usersByUsername[voter]">
+                    <img class="voter" :src="usersByUsername[voter].logo">
                   </div>
                 </div>
               </div>
@@ -87,12 +93,19 @@
                         moderator: message.badges.moderator,
                         member: message.subscriber,
                       }">
-                    <span class="name">{{message.display_name}}</span>
                     <div class="avatar">
-                      <span class="member-badge" v-if="message.subscriber">
-                        <img src="https://qna.coding.garden/logo.png" />
+                      <img :src="message.user.logo">
+                      <span class="member-badge" v-if="message.user.id !== broadcasterId && message.badges.subscriber">
+                        <img src="https://static-cdn.jtvnw.net/badges/v1/5b8a0d76-4670-4f99-8874-964e20b7a839/3">
                       </span>
                     </div>
+                    <span class="badges-and-name">
+                      <span v-if="message.user.id !== broadcasterId && message.badges.moderator"><img class="badge moderator" src="https://cdn.frankerfacez.com/static/badges/twitch/2/moderator/1/4.png"></span>
+                      <span v-if="message.badges.vip"><img class="badge vip" src="https://cdn.frankerfacez.com/static/badges/twitch/2/vip/1/4.png"></span>
+                      <span v-if="message.badges.founder"><img class="badge" src="https://static-cdn.jtvnw.net/badges/v1/511b78a9-ab37-472f-9569-457753bbe7d3/3"></span>
+                      <span class="name">{{message.user.display_name}}</span>
+                      <span class="star" v-if="message.user.id == broadcasterId">★</span>
+                    </span>
                   </span>
                   <span class="content" v-html="message.sanitized"></span>
                   <span class="content" v-if="message.showSource">

@@ -70,6 +70,7 @@ topic.addEventListener('click', () => {
   new Vue({
     el: '#messages',
     data: {
+      broadcasterId: '413856795',
       showInfo: true,
       firstLoad: true,
       isAdmin: localStorage.token,
@@ -79,6 +80,7 @@ topic.addEventListener('click', () => {
         submissions: [],
         ideas: [],
       },
+      usersByUsername: {},
       authors: {},
     },
     async created() {
@@ -173,15 +175,24 @@ topic.addEventListener('click', () => {
         voxPopuliService.on('removed', (message) => {
           this.onRemoved(message);
         })
+        const usersByUsername = all.users.reduce((byName, user) => {
+          byName[user.name] = user;
+          return byName;
+        }, {});
         const processMessages = type => message => {
           processMessage(message);
+          message.user = usersByUsername[message.username];
           message.type = type;
           message.upvotes = [...new Set(message.upvotes)];
-          message.comments.forEach(processMessage);
+          message.comments.forEach((comment) => {
+            comment.user = usersByUsername[comment.username];
+            processMessage(comment);
+          });
         };
         all.questions.forEach(processMessages('questions'));
         all.ideas.forEach(processMessages('ideas'));
         all.submissions.forEach(processMessages('submissions'));
+        this.usersByUsername = usersByUsername;
         this.all = all;
         if (window.location.hash) {
           const num = window.location.hash.split('-')[1];
@@ -203,6 +214,7 @@ topic.addEventListener('click', () => {
         main.style.opacity = 1;
       },
       addLatestMessage(message) {
+        this.$set(this.usersByUsername, message.username, message.user);
         const args = message.message.split(' ');
         const command = args.shift();
         if (command.match(/^!(ask|idea|submit)/)) {
@@ -231,7 +243,7 @@ topic.addEventListener('click', () => {
             processMessage(message);
             this.allByNum[num].comments.push(message);
           } else if (command === '!upvote') {
-            this.allByNum[num].upvotes.push(message.display_name);
+            this.allByNum[num].upvotes.push(message.username);
             this.allByNum[num].upvotes = [...new Set(this.allByNum[num].upvotes)];
           }
         }

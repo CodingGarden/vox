@@ -50,6 +50,13 @@
   margin-bottom: 0.25rem;
 }
 
+.author img.badge {
+  width: 20px;
+  height: 20px;
+  border-radius: 0;
+  margin-left: 6px;
+}
+
 .author .name {
   margin-left: 0.5rem;
   font-size: 1.2rem;
@@ -63,9 +70,10 @@
 
 .author .avatar .member-badge img {
   position: absolute;
-  bottom: -5px;
+  bottom: -2px;
   width: 25px;
   height: 25px;
+  right: -5px;
 }
 
 .message .content {
@@ -160,6 +168,19 @@ img[src$="#emote"] {
   height: 50px;
 }
 
+img.badge.moderator {
+  background: #23CE6B;
+}
+img.badge.vip {
+  background: #BD2D87;
+}
+
+.badges-and-name {
+  display: flex;
+  justify-content: center;
+  height: 100%;
+}
+
 .reply {
   box-shadow: 11px 10px 43px 0px rgba(0, 0, 0, 0.51);
 }
@@ -179,8 +200,10 @@ img[src$="#emote"] {
   stroke: white;
 }
 
-.voter {
+.author img.voter {
   margin: 0 0.5rem;
+  width: 25px;
+  height: 25px;
 }
 
 .tabs {
