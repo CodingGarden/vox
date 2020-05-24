@@ -19,7 +19,7 @@ topic.addEventListener('click', () => {
 });
 
 (async () => {
-  DOMPurify.addHook('afterSanitizeAttributes', (node) => {    
+  DOMPurify.addHook('afterSanitizeAttributes', (node) => {
     if (node.hasAttribute('src')) {
       node.setAttribute('src', `https://external-content.duckduckgo.com/iu/?u=${node.getAttribute('src')}`);
     }
@@ -31,6 +31,7 @@ topic.addEventListener('click', () => {
     message.sanitized = DOMPurify
       .sanitize(marked(message.content), {
         FORBID_ATTR: [
+          'class',
           'style',
           'onerror',
           'onload',
