@@ -215,7 +215,7 @@ topic.addEventListener('click', () => {
       },
       addLatestMessage(message) {
         this.$set(this.usersByUsername, message.username, message.user);
-        const args = message.message.split(' ');
+        const args = (message.parsedMessage || message.message).split(' ');
         const command = args.shift();
         if (command.match(/^!(ask|idea|submit)/)) {
           if (!message.num) return;
