@@ -111,7 +111,9 @@ topic.addEventListener('click', () => {
           if (a.user.subscription && !b.user.subscription) return -1;
           if (!a.user.subscription && b.user.subscription) return 1;
           if (a.badges.moderator && !b.badges.moderator) return -1;
+          if (b.badges.moderator && !a.badges.moderator) return 1;
           if (a.badges.vip && !b.badges.vip) return -1;
+          if (b.badges.vip && !a.badges.vip) return 1;
           const diff = b.upvotes.length - a.upvotes.length;
           if (diff !== 0) return diff;
           return new Date(a.created_at) - new Date(b.created_at);
