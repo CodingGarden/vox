@@ -26,6 +26,7 @@ topic.addEventListener('click', () => {
   });
 
   const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:2020' : 'https://api.coding.garden';
+  // const API_URL = 'https://api.coding.garden';
 
   function sanitize(message) {
     message.sanitized = DOMPurify
@@ -107,8 +108,10 @@ topic.addEventListener('click', () => {
         }
 
         const sorted = items.sort((a, b) => {
-          if (a.subscriber && !b.subscriber) return -1;
-          if (!a.subscriber && b.subscriber) return 1;
+          if (a.user.subscription && !b.user.subscription) return -1;
+          if (!a.user.subscription && b.user.subscription) return 1;
+          if (a.badges.moderator && !b.badges.moderator) return -1;
+          if (a.badges.vip && !b.badges.vip) return -1;
           const diff = b.upvotes.length - a.upvotes.length;
           if (diff !== 0) return diff;
           return new Date(a.created_at) - new Date(b.created_at);
