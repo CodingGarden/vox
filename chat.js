@@ -1,6 +1,6 @@
 import DOMPurify from './lib/purify.min.js';
 import marked from './lib/marked.min.js';
-import Vue from './lib/vue.js';
+import Vue from './lib/vue.min.js';
 import io from './lib/socket.io.js';
 import * as timeago from './lib/timeago.min.js';
 import feathers from './lib/feathers.js';
@@ -25,8 +25,8 @@ topic.addEventListener('click', () => {
     }
   });
 
-  // const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:2020' : 'https://api.coding.garden';
-  const API_URL = 'https://api.coding.garden';
+  const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:2020' : 'https://api.coding.garden';
+  // const API_URL = 'https://api.coding.garden';
 
   function sanitize(message) {
     message.sanitized = DOMPurify
@@ -189,6 +189,7 @@ topic.addEventListener('click', () => {
           _id: 'not-found',
           name: 'No Found',
           created_at: '2018-03-03T01:26:07.36562Z',
+          logo: 'https://i.imgur.com/jidTZrw.png',
           follow: false,
           subscription: false,
         };
