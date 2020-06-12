@@ -51,7 +51,7 @@
                 }">
                 <div class="avatar">
                   <img :src="message.user.logo">
-                  <span class="member-badge" v-if="message.user.id !== broadcasterId && message.badges.subscriber">
+                  <span class="member-badge" v-if="message.user.id !== broadcasterId && message.user.subscription">
                     <img src="https://static-cdn.jtvnw.net/badges/v1/5b8a0d76-4670-4f99-8874-964e20b7a839/3">
                   </span>
                 </div>
