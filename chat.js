@@ -1,3 +1,12 @@
+/* eslint-disable no-confusing-arrow */
+/* eslint-disable camelcase */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-restricted-globals */
+/* eslint-disable no-prototype-builtins */
+/* eslint-disable no-return-assign */
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-new */
+
 import DOMPurify from './lib/purify.min.js';
 import marked from './lib/marked.min.js';
 import Vue from './lib/vue.min.js';
@@ -12,9 +21,9 @@ const main = document.querySelector('main');
 
 topic.addEventListener('click', () => {
   if (info.style.display === 'none') {
-    info.style.display = ''
+    info.style.display = '';
   } else {
-    info.style.display = 'none'
+    info.style.display = 'none';
   }
 });
 
@@ -49,7 +58,7 @@ topic.addEventListener('click', () => {
           'embed',
           'textarea',
           'frame',
-          'frameset'
+          'frameset',
         ],
       });
   }
@@ -68,7 +77,13 @@ topic.addEventListener('click', () => {
   const client = feathers();
   client.configure(feathers.socketio(io(API_URL)));
   const voxPopuliService = client.service('vox/populi');
+  const usersService = client.service('twitch/users');
   let scrollTimeOut;
+
+  const isHere = (last_seen) => last_seen
+    ? new Date(last_seen) > Date.now() - (60 * 5 * 1000)
+    : false;
+
   new Vue({
     el: '#messages',
     data: {
@@ -108,6 +123,8 @@ topic.addEventListener('click', () => {
         }
 
         const sorted = items.sort((a, b) => {
+          if (isHere(a.user.last_seen) && !isHere(b.user.last_seen)) return -1;
+          if (!isHere(a.user.last_seen) && isHere(b.user.last_seen)) return 1;
           if (a.user.subscription && !b.user.subscription) return -1;
           if (!a.user.subscription && b.user.subscription) return 1;
           if (a.badges.moderator && !b.badges.moderator) return -1;
@@ -119,10 +136,10 @@ topic.addEventListener('click', () => {
           return new Date(a.created_at) - new Date(b.created_at);
         });
         return sorted;
-      }
+      },
     },
     methods: {
-      scrollIntoView(item) {
+      scrollIntoView() {
         if (!this.firstLoad) return;
         clearTimeout(scrollTimeOut);
         // debounce until last item has been added to page
@@ -170,7 +187,7 @@ topic.addEventListener('click', () => {
         await voxPopuliService.remove(message._id, {
           query: {
             key: localStorage.token,
-          }
+          },
         });
       },
       async loadMessages() {
@@ -180,7 +197,20 @@ topic.addEventListener('click', () => {
         });
         voxPopuliService.on('removed', (message) => {
           this.onRemoved(message);
-        })
+        });
+        usersService.on('patched', (user) => {
+          const updateUser = (message) => {
+            if (message.username === user.name) {
+              message.user = user;
+            }
+            if (message.comments) {
+              message.comments.forEach(updateUser);
+            }
+          };
+          all.questions.forEach(updateUser);
+          all.ideas.forEach(updateUser);
+          all.submissions.forEach(updateUser);
+        });
         const usersByUsername = all.users.reduce((byName, user) => {
           byName[user.name] = user;
           return byName;
@@ -193,11 +223,12 @@ topic.addEventListener('click', () => {
           follow: false,
           subscription: false,
         };
-        const processMessages = type => message => {
+        const processMessages = (type) => (message) => {
           processMessage(message);
           message.user = usersByUsername[message.username] || notFoundUser;
           message.type = type;
           message.upvotes = [...new Set(message.upvotes)];
+          message.is_here = isHere(message.user.last_seen);
           message.comments.forEach((comment) => {
             comment.user = usersByUsername[comment.username] || notFoundUser;
             processMessage(comment);
@@ -216,8 +247,9 @@ topic.addEventListener('click', () => {
           }
         }
         setInterval(() => {
-          const setTimeSents = message => {
+          const setTimeSents = (message) => {
             setTimesent(message);
+            message.is_here = isHere(message.user.last_seen);
             message.comments.forEach(setTimesent);
           };
           all.questions.forEach(setTimeSents);
@@ -262,6 +294,6 @@ topic.addEventListener('click', () => {
           }
         }
       },
-    }
+    },
   });
 })();

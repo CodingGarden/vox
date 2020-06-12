@@ -13,7 +13,7 @@
 
 .message {
   color: white;
-  background: #392F5AEE;
+  background: #605f65ee;
   margin: 0.5rem;
   border-radius: 20px;
   padding: 1rem;
@@ -21,6 +21,10 @@
   overflow-y: auto;
   position: relative;
   display: flex;
+}
+
+.message.here {
+  background: #392F5AEE;
 }
 
 .message .q-number {

@@ -34,7 +34,7 @@
           :class="{ active: selectedTab === 'submissions' }">Submissions ({{all.submissions.length}})</a>
       </div>
       <transition-group @after-enter="scrollIntoView" class="messages" name="messages" tag="div">
-        <div class="message messages-item" v-for="message in sortedItems" :key="message.id">
+        <div class="message messages-item" v-for="message in sortedItems" :key="message.id" :class="{ here: message.is_here }">
           <h1 class="q-number"><span :id="`num-${message.num}`" class="anchor"></span><a class="anchor" :href="`#num-${message.num}`">#{{message.num}}</a></h1>
           <div class="contents">
             <div v-if="isAdmin" class="button delete-button" @click="archive(message)">
@@ -78,7 +78,7 @@
               <small class="time-sent">{{message.timesent}}</small>
             </div>
             <transition-group class="messages" name="messages" tag="div" v-if="message.comments.length">
-              <div class="message messages-item reply" v-for="message in message.comments" :key="message.id">
+              <div class="message messages-item reply" v-for="message in message.comments" :key="message.id" :class="{ here: message.is_here }">
                 <div class="contents">
                   <div v-if="isAdmin" class="button delete-button" @click="archive(message)">
                     <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"
