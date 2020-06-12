@@ -75,7 +75,7 @@ topic.addEventListener('click', () => {
   }
 
   const client = feathers();
-  client.configure(feathers.socketio(io(API_URL)));
+  client.configure(feathers.socketio(io(API_URL, { timeout: 15000, 'connect timeout': 5000 })));
   const voxPopuliService = client.service('vox/populi');
   const usersService = client.service('twitch/users');
   let scrollTimeOut;
