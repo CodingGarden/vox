@@ -34,8 +34,8 @@ topic.addEventListener('click', () => {
     }
   });
 
-  const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:2020' : 'https://api.coding.garden';
-  // const API_URL = 'https://api.coding.garden';
+  // const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:2020' : 'https://api.coding.garden';
+  const API_URL = 'https://api.coding.garden';
 
   function sanitize(message) {
     message.sanitized = DOMPurify
@@ -81,7 +81,7 @@ topic.addEventListener('click', () => {
   let scrollTimeOut;
 
   const isHere = (last_seen) => last_seen
-    ? new Date(last_seen) > Date.now() - (60 * 5 * 1000)
+    ? (new Date(last_seen) > Date.now() - (60 * 5 * 1000))
     : false;
 
   new Vue({
@@ -123,8 +123,8 @@ topic.addEventListener('click', () => {
         }
 
         const sorted = items.sort((a, b) => {
-          if (isHere(a.user.last_seen) && !isHere(b.user.last_seen)) return -1;
-          if (!isHere(a.user.last_seen) && isHere(b.user.last_seen)) return 1;
+          if (a.is_here && !b.is_here) return -1;
+          if (b.is_here && !a.is_here) return 1;
           if (a.user.subscription && !b.user.subscription) return -1;
           if (!a.user.subscription && b.user.subscription) return 1;
           if (a.badges.moderator && !b.badges.moderator) return -1;
@@ -250,7 +250,10 @@ topic.addEventListener('click', () => {
           const setTimeSents = (message) => {
             setTimesent(message);
             message.is_here = isHere(message.user.last_seen);
-            message.comments.forEach(setTimesent);
+            message.comments.forEach((comment) => {
+              setTimesent(comment);
+              comment.is_here = isHere(comment.user.last_seen);
+            });
           };
           all.questions.forEach(setTimeSents);
           all.ideas.forEach(setTimeSents);
@@ -261,6 +264,7 @@ topic.addEventListener('click', () => {
       },
       addLatestMessage(message) {
         this.$set(this.usersByUsername, message.username, message.user);
+        message.is_here = true;
         const args = (message.parsedMessage || message.message).split(' ');
         const command = args.shift();
         if (command.match(/^!(ask|idea|submit)/)) {

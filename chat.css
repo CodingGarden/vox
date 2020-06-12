@@ -21,6 +21,7 @@
   overflow-y: auto;
   position: relative;
   display: flex;
+  width: 100%;
 }
 
 .message.here {
@@ -271,3 +272,14 @@ a.button:hover, a.button.active {
     width: 96%;
   }
 }
+/* 
+@media all and (min-width: 1400px) {
+  .messages {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .parent {
+    width: 45%;
+  }
+} */
