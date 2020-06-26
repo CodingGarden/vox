@@ -129,6 +129,10 @@ a:visited {
   color: #E6AF2E;
 }
 
+.message {
+  margin: 0 0 10px 0;
+}
+
 .messages-item {
   transition: all 500ms ease-in;
 }
