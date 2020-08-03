@@ -27,6 +27,8 @@
     </div>
     <div id="messages" class="chat" style="display:none">
       <div class="tabs">
+        <a v-if="todayQuestions.length" class="button" @click="selectedTab = 'today'"
+          :class="{ active: selectedTab === 'today' }">Today ({{todayQuestions.length}})</a>
         <a class="button" @click="selectedTab = 'questions'"
           :class="{ active: selectedTab === 'questions' }">Questions ({{all.questions.length}})</a>
         <a class="button" @click="selectedTab = 'ideas'" :class="{ active: selectedTab === 'ideas' }">Ideas ({{all.ideas.length}})</a>

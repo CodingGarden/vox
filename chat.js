@@ -34,8 +34,8 @@ topic.addEventListener('click', () => {
     }
   });
 
-  // const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:2020' : 'https://api.coding.garden';
-  const API_URL = 'https://api.coding.garden';
+  const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:2020' : 'https://api.coding.garden';
+  // const API_URL = 'https://api.coding.garden';
 
   function sanitize(message) {
     message.sanitized = DOMPurify
@@ -80,9 +80,9 @@ topic.addEventListener('click', () => {
   const usersService = client.service('twitch/users');
   let scrollTimeOut;
 
-  const isHere = (last_seen) => last_seen
-    ? (new Date(last_seen) > Date.now() - (60 * 5 * 1000))
-    : false;
+  const isLast5Minutes = (date) => date ? (new Date(date) > Date.now() - (60 * 5 * 1000)) : false;
+
+  const isHere = (last_seen, created_at) => isLast5Minutes(last_seen) || isLast5Minutes(created_at);
 
   new Vue({
     el: '#messages',
@@ -97,6 +97,7 @@ topic.addEventListener('click', () => {
         submissions: [],
         ideas: [],
       },
+      today: [],
       usersByUsername: {},
       authors: {},
     },
@@ -105,6 +106,10 @@ topic.addEventListener('click', () => {
       this.loadMessages();
     },
     computed: {
+      todayQuestions() {
+        const today = new Date().toDateString();
+        return this.all.questions.filter((q) => new Date(q.created_at).toDateString() === today);
+      },
       allByNum() {
         const byNum = {};
         this.all.questions.forEach((item) => byNum[item.num] = item);
@@ -114,7 +119,9 @@ topic.addEventListener('click', () => {
       },
       sortedItems() {
         let items = [];
-        if (this.selectedTab === 'questions') {
+        if (this.selectedTab === 'today') {
+          items = this.todayQuestions;
+        } if (this.selectedTab === 'questions') {
           items = this.all.questions;
         } else if (this.selectedTab === 'ideas') {
           items = this.all.ideas;
@@ -228,7 +235,7 @@ topic.addEventListener('click', () => {
           message.user = usersByUsername[message.username] || notFoundUser;
           message.type = type;
           message.upvotes = [...new Set(message.upvotes)];
-          message.is_here = isHere(message.user.last_seen);
+          message.is_here = isHere(message.user.last_seen, message.created_at);
           message.comments.forEach((comment) => {
             comment.user = usersByUsername[comment.username] || notFoundUser;
             processMessage(comment);
@@ -249,10 +256,10 @@ topic.addEventListener('click', () => {
         setInterval(() => {
           const setTimeSents = (message) => {
             setTimesent(message);
-            message.is_here = isHere(message.user.last_seen);
+            message.is_here = isHere(message.user.last_seen, message.created_at);
             message.comments.forEach((comment) => {
               setTimesent(comment);
-              comment.is_here = isHere(comment.user.last_seen);
+              comment.is_here = isHere(comment.user.last_seen, message.created_at);
             });
           };
           all.questions.forEach(setTimeSents);
