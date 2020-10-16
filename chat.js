@@ -298,7 +298,9 @@ topic.addEventListener('click', () => {
           let found = this.all.questions.find((item) => item.num === message.num);
           if (!found) {
             found = this.all.submissions.find((item) => item.num === message.num);
-          } else if (!found) {
+          }
+
+          if (!found) {
             found = this.all.ideas.find((item) => item.num === message.num);
           }
 
