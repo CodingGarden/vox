@@ -190,18 +190,24 @@ img.badge.vip {
   box-shadow: 11px 10px 43px 0px rgba(0, 0, 0, 0.51);
 }
 
-.delete-button {
+.action-buttons {
   margin-top: 0.25rem;
   position: absolute;
   top: 0.5rem;
-  right: 0.5rem;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
 }
 
-.delete-button svg line {
+.icon {
+  margin: 0.25rem;
+}
+
+.icon svg line {
   stroke: white;
 }
 
-.delete-button svg polygon {
+.icon svg polygon {
   stroke: white;
 }
 
