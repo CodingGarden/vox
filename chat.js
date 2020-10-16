@@ -34,8 +34,8 @@ topic.addEventListener('click', () => {
     }
   });
 
-  const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:2020' : 'https://api.coding.garden';
-  // const API_URL = 'https://api.coding.garden';
+  // const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:2020' : 'https://api.coding.garden';
+  const API_URL = 'https://api.coding.garden';
 
   function sanitize(message) {
     message.sanitized = DOMPurify
@@ -203,6 +203,7 @@ topic.addEventListener('click', () => {
         }
       },
       async pin(message) {
+        console.log('Pinning message...', message);
         await voxPopuliService.patch(message._id, {
           pinned: true,
         }, {

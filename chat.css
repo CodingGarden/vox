@@ -194,7 +194,7 @@ img.badge.vip {
   margin-top: 0.25rem;
   position: absolute;
   top: 0.5rem;
-  width: 100%;
+  right: 0.5rem;
   display: flex;
   justify-content: flex-end;
 }
