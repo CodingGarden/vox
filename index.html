@@ -26,6 +26,97 @@
       </div>
     </div>
     <div id="messages" class="chat" style="display:none">
+      <div class="pinned">
+        <transition-group @after-enter="scrollIntoView" class="messages" name="messages" tag="div">
+          <div class="message messages-item parent" v-for="message in pinned" :key="message.id" :class="{ here: message.is_here }">
+            <h1 class="q-number"><span :id="`num-${message.num}`" class="anchor"></span><a class="anchor" :href="`#num-${message.num}`">#{{message.num}}</a></h1>
+            <div class="contents">
+              <div v-if="isAdmin" class="button delete-button" @click="archive(message)">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"
+                  stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1">
+                  <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
+                  <line x1="15" y1="9" x2="9" y2="15"></line>
+                  <line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+              </div>
+              <span class="author" :class="{
+                    moderator: message.badges.moderator,
+                    member: message.subscriber,
+                  }">
+                  <div class="avatar">
+                    <img :src="message.user.logo">
+                    <span class="member-badge" v-if="message.user.id !== broadcasterId && message.user.subscription">
+                      <img src="https://static-cdn.jtvnw.net/badges/v1/5b8a0d76-4670-4f99-8874-964e20b7a839/3">
+                    </span>
+                  </div>
+                  <span class="badges-and-name">
+                    <span v-if="message.user.id !== broadcasterId && message.badges.moderator"><img class="badge moderator" src="https://cdn.frankerfacez.com/static/badges/twitch/2/moderator/1/4.png"></span>
+                    <span v-if="message.badges.vip"><img class="badge vip" src="https://cdn.frankerfacez.com/static/badges/twitch/2/vip/1/4.png"></span>
+                    <span v-if="message.badges.founder"><img class="badge" src="https://static-cdn.jtvnw.net/badges/v1/511b78a9-ab37-472f-9569-457753bbe7d3/3"></span>
+                    <span class="name">{{message.user.display_name}}</span>
+                    <span class="star" v-if="message.user.id == broadcasterId">★</span>
+                  </span>
+              </span>
+              <span class="content" v-html="message.sanitized"></span>
+              <span class="content" v-if="message.showSource">
+                <textarea rows="3" disabled>{{message.message}}</textarea>
+              </span>
+              <div class="bottom-bar m-1">
+                <div>
+                  <div v-if="message.upvotes.length" class="author voters">
+                    <div class="avatar" v-for="voter in message.upvotes" v-if="usersByUsername[voter]">
+                      <img class="voter" :src="usersByUsername[voter].logo">
+                    </div>
+                  </div>
+                </div>
+                <small class="time-sent">{{message.timesent}}</small>
+              </div>
+              <transition-group class="messages" name="messages" tag="div" v-if="message.comments.length">
+                <div class="message messages-item reply" v-for="message in message.comments" :key="message.id" :class="{ here: message.is_here }">
+                  <div class="contents">
+                    <div v-if="isAdmin" class="button delete-button" @click="archive(message)">
+                      <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1">
+                        <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2">
+                        </polygon>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                      </svg>
+                    </div>
+                    <span class="author" :class="{
+                          moderator: message.badges.moderator,
+                          member: message.subscriber,
+                        }">
+                      <div class="avatar">
+                        <img :src="message.user.logo">
+                        <span class="member-badge" v-if="message.user.id !== broadcasterId && message.badges.subscriber">
+                          <img src="https://static-cdn.jtvnw.net/badges/v1/5b8a0d76-4670-4f99-8874-964e20b7a839/3">
+                        </span>
+                      </div>
+                      <span class="badges-and-name">
+                        <span v-if="message.user.id !== broadcasterId && message.badges.moderator"><img class="badge moderator" src="https://cdn.frankerfacez.com/static/badges/twitch/2/moderator/1/4.png"></span>
+                        <span v-if="message.badges.vip"><img class="badge vip" src="https://cdn.frankerfacez.com/static/badges/twitch/2/vip/1/4.png"></span>
+                        <span v-if="message.badges.founder"><img class="badge" src="https://static-cdn.jtvnw.net/badges/v1/511b78a9-ab37-472f-9569-457753bbe7d3/3"></span>
+                        <span class="name">{{message.user.display_name}}</span>
+                        <span class="star" v-if="message.user.id == broadcasterId">★</span>
+                      </span>
+                    </span>
+                    <span class="content" v-html="message.sanitized"></span>
+                    <span class="content" v-if="message.showSource">
+                      <textarea rows="3" disabled>{{message.message}}</textarea>
+                    </span>
+                    <div class="bottom-bar">
+                      <div>
+                      </div>
+                      <small class="time-sent">{{message.timesent}}</small>
+                    </div>
+                  </div>
+                </div>
+              </transition-group>
+            </div>
+          </div>
+        </transition-group>
+      </div>
       <div class="tabs">
         <a v-if="todayQuestions.length" class="button" @click="selectedTab = 'today'"
           :class="{ active: selectedTab === 'today' }">Today ({{todayQuestions.length}})</a>

@@ -115,6 +115,13 @@ topic.addEventListener('click', () => {
         const today = new Date().toDateString();
         return this.all.questions.filter((q) => new Date(q.created_at).toDateString() === today);
       },
+      pinned() {
+        return [
+          ...this.all.questions.filter((item) => item.pinned),
+          ...this.all.submissions.filter((item) => item.pinned),
+          ...this.all.ideas.filter((item) => item.pinned),
+        ];
+      },
       allByNum() {
         const byNum = {};
         this.all.questions.forEach((item) => byNum[item.num] = item);
@@ -195,6 +202,15 @@ topic.addEventListener('click', () => {
           }
         }
       },
+      async pin(message) {
+        await voxPopuliService.patch(message._id, {
+          pinned: true,
+        }, {
+          query: {
+            key: localStorage.token,
+          },
+        });
+      },
       async archive(message) {
         await voxPopuliService.remove(message._id, {
           query: {
@@ -206,6 +222,9 @@ topic.addEventListener('click', () => {
         const all = await voxPopuliService.find();
         voxPopuliService.on('created', (message) => {
           this.addLatestMessage(message);
+        });
+        voxPopuliService.on('patched', (message) => {
+          this.updateMessage(message);
         });
         voxPopuliService.on('removed', (message) => {
           this.onRemoved(message);
@@ -273,6 +292,20 @@ topic.addEventListener('click', () => {
         }, 2000);
         loading.style.opacity = 0;
         main.style.opacity = 1;
+      },
+      updateMessage(message) {
+        if (this.allByNum[message.num]) {
+          let found = this.all.questions.find((item) => item.num === message.num);
+          if (!found) {
+            found = this.all.submissions.find((item) => item.num === message.num);
+          } else if (!found) {
+            found = this.all.ideas.find((item) => item.num === message.num);
+          }
+
+          if (found) {
+            this.$set(found, 'pinned', true);
+          }
+        }
       },
       addLatestMessage(message) {
         this.$set(this.usersByUsername, message.username, message.user);
