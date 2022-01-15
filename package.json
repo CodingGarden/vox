@@ -14,7 +14,7 @@
   "author": "CJ R. <cj@null.computer> (https://w3cj.sh)",
   "license": "MIT",
   "dependencies": {
-    "marked": "^1.1.0",
+    "marked": "^4.0.10",
     "parcel": "^1.12.4"
   },
   "browserslist": [
