@@ -15,7 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "marked": "^1.1.0",
-    "parcel": "^1.12.4"
+    "parcel": "1.12.3"
   },
   "browserslist": [
     "last 1 Chrome versions"
