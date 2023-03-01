@@ -2,7 +2,6 @@
   "name": "qna-chat",
   "version": "1.0.0",
   "description": "",
-  "main": "chat.js",
   "directories": {
     "lib": "lib"
   },
