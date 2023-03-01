@@ -28,6 +28,10 @@
   background: #392F5AEE;
 }
 
+.message.here.youtube {
+  background: #95190CEE;
+}
+
 .message .q-number {
   margin: 1rem;
 }

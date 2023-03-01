@@ -14,10 +14,13 @@
   "author": "CJ R. <cj@null.computer> (https://w3cj.sh)",
   "license": "MIT",
   "dependencies": {
-    "marked": "^1.1.0",
-    "parcel": "1.12.3"
+    "marked": "^4.2.12",
+    "parcel": "2.8.3"
   },
   "browserslist": [
     "last 1 Chrome versions"
-  ]
+  ],
+  "devDependencies": {
+    "buffer": "^5.7.1"
+  }
 }

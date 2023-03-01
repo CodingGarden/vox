@@ -34,8 +34,8 @@ topic.addEventListener('click', () => {
     }
   });
 
-  // const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:2020' : 'https://api.coding.garden';
-  const API_URL = 'https://api.coding.garden';
+  const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:2020' : 'https://api.coding.garden';
+  // const API_URL = 'https://api.coding.garden';
 
   function sanitize(message) {
     message.sanitized = DOMPurify
@@ -67,9 +67,17 @@ topic.addEventListener('click', () => {
     message.timesent = timeago.format(message.created_at);
   }
 
-  function processMessage(message) {
+  function processMessage(message, user) {
     setTimesent(message);
     sanitize(message);
+    if (message.author_handle) {
+      message.platform = 'youtube';
+    }
+    if (!message.badges) {
+      message.badges = {
+        moderator: user ? user.is_chat_moderator : false,
+      };
+    }
     message.showSource = false;
     message.isPotentiallyNaughty = message.message.match(/<|>/i);
   }
@@ -82,7 +90,8 @@ topic.addEventListener('click', () => {
     transports: ['websocket'],
   })));
   const voxPopuliService = client.service('vox/populi');
-  const usersService = client.service('twitch/users');
+  const twitchUsersService = client.service('twitch/users');
+  const youtubeUsersService = client.service('youtube/users');
   let scrollTimeOut;
 
   const isLast5Minutes = (date) => date ? (new Date(date) > Date.now() - (60 * 5 * 1000)) : false;
@@ -144,8 +153,8 @@ topic.addEventListener('click', () => {
         const sorted = items.sort((a, b) => {
           if (a.is_here && !b.is_here) return -1;
           if (b.is_here && !a.is_here) return 1;
-          if (a.user.subscription && !b.user.subscription) return -1;
-          if (!a.user.subscription && b.user.subscription) return 1;
+          if ((a.user.subscription || a.user.membership) && !(b.user.subscription || b.user.membership)) return -1;
+          if (!(a.user.subscription || a.user.membership) && (b.user.subscription || b.user.membership)) return 1;
           if (a.badges.moderator && !b.badges.moderator) return -1;
           if (b.badges.moderator && !a.badges.moderator) return 1;
           if (a.badges.vip && !b.badges.vip) return -1;
@@ -230,7 +239,7 @@ topic.addEventListener('click', () => {
         voxPopuliService.on('removed', (message) => {
           this.onRemoved(message);
         });
-        usersService.on('patched', (user) => {
+        twitchUsersService.on('patched', (user) => {
           const updateUser = (message) => {
             if (message.username === user.name) {
               message.user = user;
@@ -243,8 +252,21 @@ topic.addEventListener('click', () => {
           all.ideas.forEach(updateUser);
           all.submissions.forEach(updateUser);
         });
+        youtubeUsersService.on('patched', (user) => {
+          const updateUser = (message) => {
+            if (message.author_handle === user.handle) {
+              message.user = user;
+            }
+            if (message.comments) {
+              message.comments.forEach(updateUser);
+            }
+          };
+          all.questions.forEach(updateUser);
+          all.ideas.forEach(updateUser);
+          all.submissions.forEach(updateUser);
+        });
         const usersByUsername = all.users.reduce((byName, user) => {
-          byName[user.name] = user;
+          byName[user.handle || user.name] = user;
           return byName;
         }, {});
         const notFoundUser = {
@@ -256,13 +278,14 @@ topic.addEventListener('click', () => {
           subscription: false,
         };
         const processMessages = (type) => (message) => {
-          processMessage(message);
-          message.user = usersByUsername[message.username] || notFoundUser;
+          const user = usersByUsername[message.author_handle || message.username] || notFoundUser;
+          processMessage(message, user);
+          message.user = user;
           message.type = type;
           message.upvotes = [...new Set(message.upvotes)];
           message.is_here = isHere(message.user.last_seen, message.created_at);
           message.comments.forEach((comment) => {
-            comment.user = usersByUsername[comment.username] || notFoundUser;
+            comment.user = usersByUsername[comment.author_handle || comment.username] || notFoundUser;
             processMessage(comment);
           });
         };
@@ -311,12 +334,13 @@ topic.addEventListener('click', () => {
         }
       },
       addLatestMessage(message) {
-        this.$set(this.usersByUsername, message.username, message.user);
+        this.$set(this.usersByUsername, message.author_handle || message.username, message.user);
         message.is_here = true;
         const args = (message.parsedMessage || message.message).split(' ');
         const command = args.shift();
         if (command.match(/^!(ask|idea|submit)/)) {
           if (!message.num) return;
+          if (this.allByNum[message.num]) return;
           const value = args.join(' ');
           message.content = value;
           message.comments = [];
@@ -332,16 +356,16 @@ topic.addEventListener('click', () => {
             message.type = 'submissions';
             this.all.submissions.push(message);
           }
-          processMessage(message);
+          processMessage(message, message.user);
         } else if (command.match(/^!(comment|upvote)/)) {
           const num = (args.shift() || '').replace('#', '');
           if (!num || isNaN(num) || !this.allByNum[num]) return;
           if (command === '!comment') {
             message.content = args.join(' ');
-            processMessage(message);
+            processMessage(message, message.user);
             this.allByNum[num].comments.push(message);
           } else if (command === '!upvote') {
-            this.allByNum[num].upvotes.push(message.username);
+            this.allByNum[num].upvotes.push(message.author_handle || message.username);
             this.allByNum[num].upvotes = [...new Set(this.allByNum[num].upvotes)];
           }
         }
